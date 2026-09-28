@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Student – Student Management System</title>
+  <meta name="description" content="Edit student information in the Student Management System" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🎓</div>
+        <div>
+          <span>Student MS</span>
+          <small>Admin Panel</small>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Navigation</div>
+        <a href="/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="/students" class="nav-item active"><i class="fas fa-users"></i> All Students</a>
+        <a href="/students/add" class="nav-item"><i class="fas fa-user-plus"></i> Add Student</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="admin-info">
+          <div class="admin-avatar"><%= admin ? admin.name.charAt(0).toUpperCase() : 'A' %></div>
+          <div class="admin-details">
+            <div class="name"><%= admin ? admin.name : 'Admin' %></div>
+            <div class="role">Administrator</div>
+          </div>
+        </div>
+        <form action="/logout" method="POST" style="margin:0">
+          <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </form>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+          <span class="page-title">Edit Student</span>
+        </div>
+        <div class="topbar-right">
+          <a href="/students/<%= student._id %>" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i> View</a>
+          <a href="/students" class="btn btn-ghost btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+        </div>
+      </header>
+
+      <main class="page-content fade-in">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Edit Student</h1>
+            <div class="breadcrumb">
+              <a href="/dashboard">Dashboard</a>
+              <span class="separator">/</span>
+              <a href="/students">Students</a>
+              <span class="separator">/</span>
+              <span>Edit <%= student.fullName %></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <%
+            // Helper: get value - prefer formData (after validation fail) over student
+            function val(field) {
+              if (formData && formData[field] !== undefined && formData[field] !== null) return formData[field];
+              if (student && student[field] !== undefined) return student[field];
+              return '';
+            }
+            function dateVal(field) {
+              let v = val(field);
+              if (!v) return '';
+              if (v instanceof Date) return v.toISOString().split('T')[0];
+              if (typeof v === 'string' && v.includes('T')) return v.split('T')[0];
+              return v;
+            }
+          %>
+
+          <form id="editStudentForm" action="/students/<%= student._id %>?_method=PUT" method="POST" novalidate>
+            <!-- Section: Basic Info -->
+            <div style="margin-bottom:28px">
+              <h2 style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+                <i class="fas fa-id-card" style="color:var(--primary-light);margin-right:8px"></i>Basic Information
+              </h2>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="studentId">Student ID <span class="required">*</span></label>
+                  <input
+                    id="studentId"
+                    type="text"
+                    name="studentId"
+                    class="form-control <%= errors && errors.studentId ? 'is-invalid' : '' %>"
+                    value="<%= val('studentId') %>"
+                    required
+                  />
+                  <% if (errors && errors.studentId) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.studentId %></div>
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="fullName">Full Name <span class="required">*</span></label>
+                  <input
+                    id="fullName"
+                    type="text"
+                    name="fullName"
+                    class="form-control <%= errors && errors.fullName ? 'is-invalid' : '' %>"
+                    value="<%= val('fullName') %>"
+                    required
+                  />
+                  <% if (errors && errors.fullName) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.fullName %></div>
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="email">Email Address <span class="required">*</span></label>
+                  <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    class="form-control <%= errors && errors.email ? 'is-invalid' : '' %>"
+                    value="<%= val('email') %>"
+                    required
+                  />
+                  <% if (errors && errors.email) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.email %></div>
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="mobile">Mobile Number <span class="required">*</span></label>
+                  <input
+                    id="mobile"
+                    type="text"
+                    name="mobile"
+                    class="form-control <%= errors && errors.mobile ? 'is-invalid' : '' %>"
+                    maxlength="10"
+                    value="<%= val('mobile') %>"
+                    required
+                  />
+                  <% if (errors && errors.mobile) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.mobile %></div>
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="age">Age <span class="required">*</span></label>
+                  <input
+                    id="age"
+                    type="number"
+                    name="age"
+                    class="form-control <%= errors && errors.age ? 'is-invalid' : '' %>"
+                    min="15" max="100"
+                    value="<%= val('age') %>"
+                    required
+                  />
+                  <% if (errors && errors.age) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.age %></div>
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="gender">Gender <span class="required">*</span></label>
+                  <select id="gender" name="gender" class="form-control <%= errors && errors.gender ? 'is-invalid' : '' %>" required>
+                    <option value="">Select gender</option>
+                    <% ['Male','Female','Other'].forEach(function(g) { %>
+                      <option value="<%= g %>" <%= val('gender') === g ? 'selected' : '' %>><%= g %></option>
+                    <% }) %>
+                  </select>
+                  <% if (errors && errors.gender) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.gender %></div>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section: Academic Info -->
+            <div style="margin-bottom:28px">
+              <h2 style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+                <i class="fas fa-graduation-cap" style="color:var(--primary-light);margin-right:8px"></i>Academic Information
+              </h2>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="course">Course <span class="required">*</span></label>
+                  <select id="course" name="course" class="form-control <%= errors && errors.course ? 'is-invalid' : '' %>" required>
+                    <option value="">Select a course</option>
+                    <% courses.forEach(function(c) { %>
+                      <option value="<%= c %>" <%= val('course') === c ? 'selected' : '' %>><%= c %></option>
+                    <% }) %>
+                  </select>
+                  <% if (errors && errors.course) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.course %></div>
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="year">Year <span class="required">*</span></label>
+                  <select id="year" name="year" class="form-control <%= errors && errors.year ? 'is-invalid' : '' %>" required>
+                    <option value="">Select year</option>
+                    <% [1,2,3,4,5].forEach(function(y) { %>
+                      <option value="<%= y %>" <%= parseInt(val('year')) === y ? 'selected' : '' %>>Year <%= y %></option>
+                    <% }) %>
+                  </select>
+                  <% if (errors && errors.year) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.year %></div>
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="dateOfBirth">Date of Birth <span class="required">*</span></label>
+                  <input
+                    id="dateOfBirth"
+                    type="date"
+                    name="dateOfBirth"
+                    class="form-control <%= errors && errors.dateOfBirth ? 'is-invalid' : '' %>"
+                    value="<%= dateVal('dateOfBirth') %>"
+                    required
+                  />
+                  <% if (errors && errors.dateOfBirth) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.dateOfBirth %></div>
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="enrollmentDate">Enrollment Date <span class="required">*</span></label>
+                  <input
+                    id="enrollmentDate"
+                    type="date"
+                    name="enrollmentDate"
+                    class="form-control <%= errors && errors.enrollmentDate ? 'is-invalid' : '' %>"
+                    value="<%= dateVal('enrollmentDate') %>"
+                    required
+                  />
+                  <% if (errors && errors.enrollmentDate) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.enrollmentDate %></div>
+                  <% } %>
+                </div>
+
+                <div class="form-group full">
+                  <label class="form-label" for="address">Address <span class="required">*</span></label>
+                  <textarea
+                    id="address"
+                    name="address"
+                    rows="3"
+                    class="form-control <%= errors && errors.address ? 'is-invalid' : '' %>"
+                    required
+                  ><%= val('address') %></textarea>
+                  <% if (errors && errors.address) { %>
+                    <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.address %></div>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:12px;justify-content:flex-end">
+              <a href="/students/<%= student._id %>" class="btn btn-ghost"><i class="fas fa-times"></i> Cancel</a>
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save"></i> Update Student
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

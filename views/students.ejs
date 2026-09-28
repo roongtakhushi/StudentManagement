@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Students – Student Management System</title>
+  <meta name="description" content="Manage all students in the Student Management System" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🎓</div>
+        <div>
+          <span>Student MS</span>
+          <small>Admin Panel</small>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Navigation</div>
+        <a href="/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="/students" class="nav-item active"><i class="fas fa-users"></i> All Students</a>
+        <a href="/students/add" class="nav-item"><i class="fas fa-user-plus"></i> Add Student</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="admin-info">
+          <div class="admin-avatar"><%= admin ? admin.name.charAt(0).toUpperCase() : 'A' %></div>
+          <div class="admin-details">
+            <div class="name"><%= admin ? admin.name : 'Admin' %></div>
+            <div class="role">Administrator</div>
+          </div>
+        </div>
+        <form action="/logout" method="POST" style="margin:0">
+          <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+          <span class="page-title">Students</span>
+        </div>
+        <div class="topbar-right">
+          <a href="/students/add" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add Student</a>
+        </div>
+      </header>
+
+      <main class="page-content fade-in">
+        <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+          <div class="alert alert-success"><i class="fas fa-check-circle"></i> <%= successMessage %></div>
+        <% } %>
+        <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+          <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <%= errorMessage %></div>
+        <% } %>
+
+        <div class="card">
+          <!-- Search & Filter -->
+          <div class="card-header" style="flex-direction:column; align-items:flex-start; gap:16px">
+            <div style="display:flex; justify-content:space-between; width:100%; align-items:center">
+              <span class="card-title"><i class="fas fa-users" style="color:var(--primary-light)"></i> All Students</span>
+              <span class="badge badge-primary"><%= pagination.total %> Total</span>
+            </div>
+
+            <form action="/students" method="GET" class="search-bar" style="width:100%">
+              <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input
+                  type="text"
+                  name="search"
+                  id="searchInput"
+                  placeholder="Search by name, ID, email, mobile..."
+                  value="<%= search %>"
+                />
+              </div>
+              <select name="course" id="courseFilter" class="form-control" style="width:200px; margin:0">
+                <option value="">All Courses</option>
+                <% courses.forEach(function(c) { %>
+                  <option value="<%= c %>" <%= selectedCourse === c ? 'selected' : '' %>><%= c %></option>
+                <% }) %>
+              </select>
+              <button type="submit" class="btn btn-secondary"><i class="fas fa-search"></i> Search</button>
+              <% if (search || selectedCourse) { %>
+                <a href="/students" class="btn btn-ghost"><i class="fas fa-times"></i> Clear</a>
+              <% } %>
+            </form>
+          </div>
+
+          <!-- Table -->
+          <% if (students.length === 0) { %>
+            <div class="empty-state">
+              <i class="fas fa-search"></i>
+              <h3><%= search || selectedCourse ? 'No results found' : 'No students yet' %></h3>
+              <p><%= search || selectedCourse ? 'Try different search terms.' : 'Start by adding your first student.' %></p>
+              <% if (search || selectedCourse) { %>
+                <a href="/students" class="btn btn-secondary btn-sm"><i class="fas fa-times"></i> Clear Filters</a>
+              <% } else { %>
+                <a href="/students/add" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add Student</a>
+              <% } %>
+            </div>
+          <% } else { %>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Course</th>
+                    <th>Year</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% students.forEach(function(s) { %>
+                    <tr data-student-id="<%= s._id %>">
+                      <td>
+                        <span class="badge badge-primary"><%= s.studentId %></span>
+                      </td>
+                      <td>
+                        <div style="display:flex;align-items:center;gap:10px">
+                          <div class="student-mini-avatar" style="width:32px;height:32px;font-size:12px">
+                            <%= s.fullName.charAt(0).toUpperCase() %>
+                          </div>
+                          <div>
+                            <div style="font-weight:600"><%= s.fullName %></div>
+                            <div style="font-size:11px;color:var(--text-muted)"><%= s.gender %></div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style="color:var(--text-secondary)"><%= s.email %></td>
+                      <td><%= s.mobile %></td>
+                      <td>
+                        <span class="badge badge-secondary"><%= s.course %></span>
+                      </td>
+                      <td>
+                        <span class="badge badge-success">Year <%= s.year %></span>
+                      </td>
+                      <td>
+                        <div class="action-btns">
+                          <a href="/students/<%= s._id %>" class="btn btn-ghost btn-icon btn-sm" title="View Details">
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a href="/students/<%= s._id %>/edit" class="btn btn-warning btn-icon btn-sm" title="Edit">
+                            <i class="fas fa-edit"></i>
+                          </a>
+                          <button
+                            type="button"
+                            class="btn btn-danger btn-icon btn-sm"
+                            title="Delete"
+                            onclick="confirmDelete('<%= s._id %>', '<%= s.fullName.replace(/'/g, `\\'`) %>')"
+                          >
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <% if (pagination.totalPages > 1) { %>
+              <div class="pagination">
+                <div class="pagination-info">
+                  Page <%= pagination.page %> of <%= pagination.totalPages %> &bull; <%= pagination.total %> total students
+                </div>
+                <div class="pagination-nav">
+                  <% if (pagination.page > 1) { %>
+                    <a href="/students?page=<%= pagination.page - 1 %>&search=<%= search %>&course=<%= selectedCourse %>" class="page-btn">
+                      <i class="fas fa-chevron-left"></i>
+                    </a>
+                  <% } %>
+                  <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+                    <a href="/students?page=<%= i %>&search=<%= search %>&course=<%= selectedCourse %>"
+                       class="page-btn <%= pagination.page === i ? 'active' : '' %>">
+                      <%= i %>
+                    </a>
+                  <% } %>
+                  <% if (pagination.page < pagination.totalPages) { %>
+                    <a href="/students?page=<%= pagination.page + 1 %>&search=<%= search %>&course=<%= selectedCourse %>" class="page-btn">
+                      <i class="fas fa-chevron-right"></i>
+                    </a>
+                  <% } %>
+                </div>
+              </div>
+            <% } %>
+          <% } %>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+      <h3>Delete Student</h3>
+      <p>Are you sure you want to delete <strong id="deleteStudentName"></strong>? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn" onclick="executeDelete()">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

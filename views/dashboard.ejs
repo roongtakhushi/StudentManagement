@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – Student Management System</title>
+  <meta name="description" content="Admin Dashboard for Student Management System" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🎓</div>
+        <div>
+          <span>Student MS</span>
+          <small>Admin Panel</small>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-label">Navigation</div>
+        <a href="/dashboard" class="nav-item active" id="nav-dashboard">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="/students" class="nav-item" id="nav-students">
+          <i class="fas fa-users"></i> All Students
+        </a>
+        <a href="/students/add" class="nav-item" id="nav-add">
+          <i class="fas fa-user-plus"></i> Add Student
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-info">
+          <div class="admin-avatar"><%= admin ? admin.name.charAt(0).toUpperCase() : 'A' %></div>
+          <div class="admin-details">
+            <div class="name"><%= admin ? admin.name : 'Admin' %></div>
+            <div class="role">Administrator</div>
+          </div>
+        </div>
+        <form action="/logout" method="POST" style="margin:0">
+          <button type="submit" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+          <span class="page-title">Dashboard</span>
+        </div>
+        <div class="topbar-right">
+          <a href="/students/add" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> Add Student
+          </a>
+        </div>
+      </header>
+
+      <main class="page-content fade-in">
+        <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+          <div class="alert alert-success"><i class="fas fa-check-circle"></i> <%= successMessage %></div>
+        <% } %>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+              <div class="stat-value"><%= totalStudents %></div>
+              <div class="stat-label">Total Students</div>
+            </div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon green"><i class="fas fa-book-open"></i></div>
+            <div class="stat-info">
+              <div class="stat-value"><%= totalCourses %></div>
+              <div class="stat-label">Active Courses</div>
+            </div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon orange"><i class="fas fa-user-graduate"></i></div>
+            <div class="stat-info">
+              <div class="stat-value"><%= recentStudents.length %></div>
+              <div class="stat-label">Recent Additions</div>
+            </div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-icon red"><i class="fas fa-shield-alt"></i></div>
+            <div class="stat-info">
+              <div class="stat-value">1</div>
+              <div class="stat-label">Admin Accounts</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <a href="/students/add" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Add New Student
+          </a>
+          <a href="/students" class="btn btn-secondary">
+            <i class="fas fa-users"></i> View All Students
+          </a>
+        </div>
+
+        <!-- Content Grid -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+
+          <!-- Recent Students -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><i class="fas fa-clock" style="color:var(--primary-light)"></i> Recent Students</span>
+              <a href="/students" class="btn btn-ghost btn-sm">View All</a>
+            </div>
+            <% if (recentStudents.length === 0) { %>
+              <div class="empty-state" style="padding:32px 0">
+                <i class="fas fa-users"></i>
+                <p>No students added yet.</p>
+                <a href="/students/add" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add First</a>
+              </div>
+            <% } else { %>
+              <% recentStudents.forEach(function(s) { %>
+                <div class="recent-student-row">
+                  <div class="student-mini-avatar"><%= s.fullName.charAt(0).toUpperCase() %></div>
+                  <div class="recent-student-info">
+                    <div class="name"><%= s.fullName %></div>
+                    <div class="meta"><%= s.studentId %> &bull; <%= s.course %></div>
+                  </div>
+                  <a href="/students/<%= s._id %>" class="btn btn-ghost btn-icon btn-sm"><i class="fas fa-eye"></i></a>
+                </div>
+              <% }) %>
+            <% } %>
+          </div>
+
+          <!-- Course Breakdown -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><i class="fas fa-chart-pie" style="color:var(--primary-light)"></i> Course Breakdown</span>
+            </div>
+            <% if (courseStats.length === 0) { %>
+              <div class="empty-state" style="padding:32px 0">
+                <i class="fas fa-chart-pie"></i>
+                <p>No course data yet.</p>
+              </div>
+            <% } else { %>
+              <% courseStats.sort((a,b) => b.count - a.count).forEach(function(cs) { %>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border)">
+                  <span style="font-size:13px; color:var(--text-primary)"><%= cs._id %></span>
+                  <span class="badge badge-primary"><%= cs.count %> student<%= cs.count !== 1 ? 's' : '' %></span>
+                </div>
+              <% }) %>
+            <% } %>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= student.fullName %> – Student Details</title>
+  <meta name="description" content="Student profile details for <%= student.fullName %>" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🎓</div>
+        <div>
+          <span>Student MS</span>
+          <small>Admin Panel</small>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Navigation</div>
+        <a href="/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="/students" class="nav-item active"><i class="fas fa-users"></i> All Students</a>
+        <a href="/students/add" class="nav-item"><i class="fas fa-user-plus"></i> Add Student</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="admin-info">
+          <div class="admin-avatar"><%= admin ? admin.name.charAt(0).toUpperCase() : 'A' %></div>
+          <div class="admin-details">
+            <div class="name"><%= admin ? admin.name : 'Admin' %></div>
+            <div class="role">Administrator</div>
+          </div>
+        </div>
+        <form action="/logout" method="POST" style="margin:0">
+          <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </form>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+          <span class="page-title">Student Details</span>
+        </div>
+        <div class="topbar-right">
+          <a href="/students/<%= student._id %>/edit" class="btn btn-warning btn-sm">
+            <i class="fas fa-edit"></i> Edit
+          </a>
+          <button
+            type="button"
+            class="btn btn-danger btn-sm"
+            onclick="confirmDelete('<%= student._id %>', '<%= student.fullName.replace(/'/g, `\\'`) %>')"
+          >
+            <i class="fas fa-trash"></i> Delete
+          </button>
+          <a href="/students" class="btn btn-ghost btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+        </div>
+      </header>
+
+      <main class="page-content fade-in">
+        <div class="breadcrumb" style="margin-bottom:20px">
+          <a href="/dashboard">Dashboard</a>
+          <span class="separator">/</span>
+          <a href="/students">Students</a>
+          <span class="separator">/</span>
+          <span><%= student.fullName %></span>
+        </div>
+
+        <div class="card">
+          <!-- Profile Header -->
+          <div class="student-profile-header">
+            <div class="student-avatar-lg">
+              <%= student.fullName.charAt(0).toUpperCase() %>
+            </div>
+            <div class="student-profile-info">
+              <h2><%= student.fullName %></h2>
+              <div class="student-id-badge">
+                <i class="fas fa-id-badge"></i> <%= student.studentId %>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+                <span class="badge badge-primary"><%= student.course %></span>
+                <span class="badge badge-success">Year <%= student.year %></span>
+                <span class="badge badge-secondary"><%= student.gender %></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Details Grid -->
+          <div class="details-grid">
+            <div class="detail-item">
+              <div class="detail-label"><i class="fas fa-envelope"></i> Email Address</div>
+              <div class="detail-value"><%= student.email %></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i class="fas fa-phone"></i> Mobile Number</div>
+              <div class="detail-value"><%= student.mobile %></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i class="fas fa-birthday-cake"></i> Age</div>
+              <div class="detail-value"><%= student.age %> years</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i class="fas fa-venus-mars"></i> Gender</div>
+              <div class="detail-value"><%= student.gender %></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i class="fas fa-book"></i> Course</div>
+              <div class="detail-value"><%= student.course %></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i class="fas fa-layer-group"></i> Year</div>
+              <div class="detail-value">Year <%= student.year %></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i class="fas fa-calendar"></i> Date of Birth</div>
+              <div class="detail-value"><%= new Date(student.dateOfBirth).toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' }) %></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i class="fas fa-calendar-check"></i> Enrollment Date</div>
+              <div class="detail-value"><%= new Date(student.enrollmentDate).toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' }) %></div>
+            </div>
+            <div class="detail-item" style="grid-column:1/-1">
+              <div class="detail-label"><i class="fas fa-map-marker-alt"></i> Address</div>
+              <div class="detail-value"><%= student.address %></div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i class="fas fa-clock"></i> Record Created</div>
+              <div class="detail-value" style="color:var(--text-secondary); font-size:13px">
+                <%= new Date(student.createdAt).toLocaleString('en-IN') %>
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i class="fas fa-history"></i> Last Updated</div>
+              <div class="detail-value" style="color:var(--text-secondary); font-size:13px">
+                <%= new Date(student.updatedAt).toLocaleString('en-IN') %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+      <h3>Delete Student</h3>
+      <p>Are you sure you want to delete <strong id="deleteStudentName"><%= student.fullName %></strong>? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn" onclick="executeDeleteAndRedirect()">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/script.js"></script>
+  <script>
+    // Override to redirect after delete on details page
+    async function executeDeleteAndRedirect() {
+      const btn = document.getElementById('confirmDeleteBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Deleting...';
+      try {
+        const res = await fetch('/api/students/<%= student._id %>', { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          window.location.href = '/students';
+        } else {
+          closeDeleteModal();
+          showToast(data.message || 'Failed to delete', 'error');
+        }
+      } catch(e) {
+        closeDeleteModal();
+        showToast('Network error', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= statusCode || 'Error' %> – Student Management System</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <% if (typeof admin !== 'undefined' && admin) { %>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🎓</div>
+        <div><span>Student MS</span><small>Admin Panel</small></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="/students" class="nav-item"><i class="fas fa-users"></i> All Students</a>
+        <a href="/students/add" class="nav-item"><i class="fas fa-user-plus"></i> Add Student</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="admin-info">
+          <div class="admin-avatar"><%= admin.name.charAt(0).toUpperCase() %></div>
+          <div class="admin-details"><div class="name"><%= admin.name %></div><div class="role">Administrator</div></div>
+        </div>
+        <form action="/logout" method="POST" style="margin:0">
+          <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </form>
+      </div>
+    </aside>
+    <div class="main-content">
+  <% } %>
+
+  <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div style="text-align:center; max-width:400px">
+      <div style="font-size:72px; font-weight:800; color:var(--primary); margin-bottom:12px; line-height:1">
+        <%= statusCode || '500' %>
+      </div>
+      <h1 style="font-size:22px; color:var(--text-primary); margin-bottom:12px">
+        <%= statusCode === 404 ? 'Page Not Found' : statusCode === 401 ? 'Unauthorized' : 'Something went wrong' %>
+      </h1>
+      <p style="color:var(--text-secondary); margin-bottom:28px; font-size:14px">
+        <%= message || 'An unexpected error occurred.' %>
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap">
+        <a href="javascript:history.back()" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> Go Back</a>
+        <a href="/dashboard" class="btn btn-primary"><i class="fas fa-home"></i> Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <% if (typeof admin !== 'undefined' && admin) { %>
+    </div>
+  </div>
+  <% } %>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

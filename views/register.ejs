@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %> – Student Management System</title>
+  <meta name="description" content="Register a new admin account for Student Management System" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon">🎓</div>
+      <h1>Create Account</h1>
+      <p>Register as a new administrator</p>
+    </div>
+
+    <form id="registerForm" action="/register" method="POST" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="name">Full Name <span class="required">*</span></label>
+        <input
+          id="name"
+          type="text"
+          name="name"
+          class="form-control <%= errors && errors.name ? 'is-invalid' : '' %>"
+          placeholder="John Doe"
+          value="<%= formData && formData.name ? formData.name : '' %>"
+          required
+        />
+        <% if (errors && errors.name) { %>
+          <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.name %></div>
+        <% } %>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address <span class="required">*</span></label>
+        <input
+          id="email"
+          type="email"
+          name="email"
+          class="form-control <%= errors && errors.email ? 'is-invalid' : '' %>"
+          placeholder="admin@example.com"
+          value="<%= formData && formData.email ? formData.email : '' %>"
+          required
+        />
+        <% if (errors && errors.email) { %>
+          <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.email %></div>
+        <% } %>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password <span class="required">*</span></label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          class="form-control <%= errors && errors.password ? 'is-invalid' : '' %>"
+          placeholder="Minimum 8 characters"
+          required
+        />
+        <% if (errors && errors.password) { %>
+          <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.password %></div>
+        <% } %>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="confirmPassword">Confirm Password <span class="required">*</span></label>
+        <input
+          id="confirmPassword"
+          type="password"
+          name="confirmPassword"
+          class="form-control <%= errors && errors.confirmPassword ? 'is-invalid' : '' %>"
+          placeholder="Repeat your password"
+          required
+        />
+        <% if (errors && errors.confirmPassword) { %>
+          <div class="invalid-feedback"><i class="fas fa-exclamation-circle"></i> <%= errors.confirmPassword %></div>
+        <% } %>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full btn-lg">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a href="/login">Sign in</a>
+    </div>
+  </div>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
